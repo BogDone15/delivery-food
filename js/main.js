@@ -21,6 +21,16 @@ let login = localStorage.getItem('Delivery');
 
 function toggleModalAuth() {
   modalAuth.classList.toggle('is-open');
+  if (modalAuth.classList.contains('is-open')) {
+    disableScroll();
+  } else {
+    enableScroll();
+  }
+}
+
+function clearForm() {
+  loginInput.style.borderColor = '';
+  logInForm.reset();
 }
 
 function authorized() {
@@ -50,22 +60,35 @@ function notAuthorized() {
 
   function logIn(event) {
     event.preventDefault();
-    login = loginInput.value;
+    if (loginInput.value.trim()) {
+      login = loginInput.value;
 
-    localStorage.setItem('Delivery', login);
+      localStorage.setItem('Delivery', login);
 
-    toggleModalAuth();
-    buttonAuth.removeEventListener('click', toggleModalAuth);
-    closeAuth.removeEventListener('click', toggleModalAuth);
-    logInForm.removeEventListener('submit', logIn);
-    logInForm.reset();
-    checkAuth();
+      toggleModalAuth();
+      buttonAuth.removeEventListener('click', toggleModalAuth);
+      closeAuth.removeEventListener('click', toggleModalAuth);
+      logInForm.removeEventListener('submit', logIn);
+      logInForm.reset();
+      checkAuth();
+    } else {
+      loginInput.style.borderColor = '#ff0000';
+      loginInput.value = '';
+    }
+
   }
 
   buttonAuth.addEventListener('click', toggleModalAuth);
   closeAuth.addEventListener('click', toggleModalAuth);
   logInForm.addEventListener('submit', logIn);
+  modalAuth.addEventListener('click', function(event) {
+    if (event.target.classList.contains('is-open')) {
+      toggleModalAuth();
+    }
+  })
 }
+
+buttonAuth.addEventListener('click', clearForm);
 
 function checkAuth() {
   if (login) {
