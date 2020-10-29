@@ -1,4 +1,5 @@
 'use strict';
+import Swiper from 'https://unpkg.com/swiper/swiper-bundle.esm.browser.min.js';
 
 const cartButton = document.querySelector("#cart-button");
 const modal = document.querySelector(".modal");
@@ -18,6 +19,11 @@ const logo = document.querySelector('.logo');
 const cardsMenu = document.querySelector('.cards-menu');
 
 let login = localStorage.getItem('Delivery');
+
+function validName(str) {
+  const regName = /^[a-zA-Z0-9-_\.]{1,20}$/;
+  return regName.test(str);
+}
 
 function toggleModal() {
   modal.classList.toggle("is-open");
@@ -64,7 +70,7 @@ function notAuthorized() {
 
   function logIn(event) {
     event.preventDefault();
-    if (loginInput.value.trim()) {
+    if (validName(loginInput.value)) {
       login = loginInput.value;
 
       localStorage.setItem('Delivery', login);
@@ -157,18 +163,22 @@ function createCardGood() {
 function openGoods(event) {
   const target = event.target;
 
-  const restaurant = target.closest('.card-restaurant');
+  if (login) {
+    const restaurant = target.closest('.card-restaurant');
 
-  if (restaurant) {
-    cardsMenu.textContent = '';
+    if (restaurant) {
+      cardsMenu.textContent = '';
 
-    containerPromo.classList.add('hide');
-    restaurants.classList.add('hide');
-    menu.classList.remove('hide');
+      containerPromo.classList.add('hide');
+      restaurants.classList.add('hide');
+      menu.classList.remove('hide');
 
-    createCardGood();
-    createCardGood();
-    createCardGood();
+      createCardGood();
+      createCardGood();
+      createCardGood();
+    } 
+  } else {
+    toggleModalAuth();
   }
 }
 
@@ -185,6 +195,20 @@ logo.addEventListener('click', function () {
 });
 
 checkAuth();
+
 createCardRestaurant();
 createCardRestaurant();
 createCardRestaurant();
+
+// Slider
+
+new Swiper('.swiper-container', {
+  sliderPerView: 1,
+  loop: true,
+  autoplay: true,
+  effect: 'flip',
+  pagination: {
+    el: '.swiper-pagination',
+    clickable: true
+  },
+});
