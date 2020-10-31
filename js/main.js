@@ -28,7 +28,19 @@ const buttonClearCart = document.querySelector('.clear-cart');
 
 let login = localStorage.getItem('Delivery');
 
-const cart = [];
+const cart = JSON.parse(localStorage.getItem(`Delivery_${login}`)) || [];
+
+function saveCart() {
+  localStorage.setItem(`Delivery_${login}` ,JSON.stringify(cart));
+}
+
+function downloadCart() {
+  if (localStorage.getItem(`Delivery_${login}`)) {
+    const data = JSON.parse(localStorage.getItem(`Delivery_${login}`));
+
+    cart.push(...data);
+  }
+}
 
 const getData = async function(url) {
   const response = await fetch(url);
@@ -63,10 +75,17 @@ function clearForm() {
   logInForm.reset();
 }
 
+function returnMain() {
+  containerPromo.classList.remove('hide');
+  restaurants.classList.remove('hide');
+  menu.classList.add('hide');
+}
+
 function authorized() {
 
   function logOut() {
     login = null;
+    cart.length = 0;
     localStorage.removeItem('Delivery');
 
     buttonAuth.style.display = '';
@@ -77,6 +96,7 @@ function authorized() {
     buttonOut.removeEventListener('click', logOut);
 
     checkAuth();
+    returnMain();
   }
 
   userName.textContent = login;
@@ -99,6 +119,7 @@ function notAuthorized() {
       localStorage.setItem('Delivery', login);
 
       toggleModalAuth();
+      downloadCart();
       buttonAuth.removeEventListener('click', toggleModalAuth);
       closeAuth.removeEventListener('click', toggleModalAuth);
       logInForm.removeEventListener('submit', logIn);
@@ -241,6 +262,8 @@ function addToCart(event) {
         count: 1
       });
     }
+
+    saveCart();
   };
 }
 
@@ -261,6 +284,7 @@ function renderCart() {
     `;
 
     modalBody.insertAdjacentHTML('afterbegin', itemCart);
+    saveCart();
   });
 
   const totalPrice = cart.reduce(function(result, item) {
@@ -304,6 +328,7 @@ function init() {
   buttonClearCart.addEventListener('click', function() {
     cart.length = 0;
     renderCart();
+    toggleModal();
   });
 
   modalBody.addEventListener('click', changeCount);
